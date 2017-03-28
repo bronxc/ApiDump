@@ -40,6 +40,43 @@ namespace ApiDump
 
         private void Print()
         {
+            PrintAssemblyInfo();
+            PrintTypes();
+        }
+
+        private void PrintAssemblyInfo()
+        {
+            Console.Write("Assembly Verison: ", Color.White);
+            Console.WriteLine(_assembly.Version, Color.DodgerBlue);
+
+            Console.WriteLine("Assembly Attributes: ", Color.White);
+            foreach (ICustomAttribute assemblyAttribute in _assembly.AssemblyAttributes)
+            {
+                Console.Write("  - ", Color.White);
+                Console.Write(assemblyAttribute.Type.FullName(), Color.White);
+
+                foreach (IMetadataExpression expression in assemblyAttribute.Arguments)
+                {
+                    if (expression is ICompileTimeConstant constant)
+                    {
+                        Console.Write(" " + constant.Value, Color.DodgerBlue);
+                    }
+                    else if (expression is IMetadataConstant mdConstant)
+                    {
+                        Console.Write(" " + mdConstant.Value, Color.DodgerBlue);
+                    }
+                    else
+                    {
+                        Console.Write(" " + expression, Color.GreenYellow);
+                    }
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        private void PrintTypes()
+        {
             foreach (INamedTypeDefinition typeDefinition in _assembly.GetAllTypes())
             {
                 if (!typeDefinition.IsVisibleOutsideAssembly())
